@@ -1,6 +1,6 @@
-#include <asyncpq/thread_connection.hpp>
+#include <async_pqxx/thread_connection.hpp>
 
-namespace asyncpq::this_thread {
+namespace async_pqxx::this_thread {
 
     thread_local std::unique_ptr<pqxx::connection> _connection;
 
@@ -12,4 +12,4 @@ namespace asyncpq::this_thread {
 
     void disconnect() { _connection.reset(); }
 
-}  // namespace asyncpq::this_thread
+}  // namespace async_pqxx::this_thread

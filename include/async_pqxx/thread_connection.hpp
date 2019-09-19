@@ -2,11 +2,11 @@
 
 #include <pqxx/connection>
 
-namespace asyncpq::this_thread {
+namespace async_pqxx::this_thread {
 
     pqxx::connection& connection();
 
     void connect(const std::string& connection_string);
     void disconnect();
 
-}  // namespace asyncpq::this_thread
+}  // namespace async_pqxx::this_thread

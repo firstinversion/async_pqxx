@@ -8,11 +8,11 @@
 #include <thread>
 #include <vector>
 
-#include "thread_connection.hpp"
-#include <asyncpq/operations/exec.hpp>
-#include <asyncpq/operations/exec1.hpp>
+#include <async_pqxx/operations/exec.hpp>
+#include <async_pqxx/operations/exec1.hpp>
+#include <async_pqxx/thread_connection.hpp>
 
-namespace asyncpq {
+namespace async_pqxx {
 
     class manager {
     public:
@@ -53,4 +53,4 @@ namespace asyncpq {
         std::vector<std::thread> _execution_threads;
     };
 
-}  // namespace asyncpq
+}  // namespace async_pqxx

@@ -7,10 +7,10 @@ conan_basic_setup()
 
 # Library
 set(LIBRARY_HEADERS
-        include/asyncpq/operations/exec.hpp
-        include/asyncpq/operations/exec1.hpp
-        include/asyncpq/manager.hpp
-        include/asyncpq/thread_connection.hpp
+        include/async_pqxx/operations/exec.hpp
+        include/async_pqxx/operations/exec1.hpp
+        include/async_pqxx/manager.hpp
+        include/async_pqxx/thread_connection.hpp
         )
 set(LIBRARY_SOURCES
         src/thread_connection.cpp

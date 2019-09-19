@@ -1,11 +1,12 @@
 #include <catch2/catch.hpp>
 
-#include <asyncpq/manager.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/spawn.hpp>
 
+#include <async_pqxx/manager.hpp>
+
 TEST_CASE("manager: select 1 from database", "[manager]") {
-    asyncpq::manager        manager(4, "host=localhost port=5432");
+    async_pqxx::manager     manager(4, "host=localhost port=5432");
     boost::asio::io_context ioc;
     boost::asio::spawn(ioc, [&](boost::asio::yield_context yield) {
         auto result = manager.exec1("SELECT 1;", yield);
@@ -15,7 +16,7 @@ TEST_CASE("manager: select 1 from database", "[manager]") {
 }
 
 TEST_CASE("manager: select from database", "[manager]") {
-    asyncpq::manager        manager(4, "host=localhost port=5432");
+    async_pqxx::manager     manager(4, "host=localhost port=5432");
     boost::asio::io_context ioc;
     boost::asio::spawn(ioc, [&](boost::asio::yield_context yield) {
         auto result = manager.exec("SELECT * FROM generate_series(1, 6) num;", yield);
