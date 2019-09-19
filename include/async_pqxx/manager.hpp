@@ -6,10 +6,12 @@
 #include <pqxx/connection>
 #include <pqxx/row>
 #include <thread>
+#include <type_traits>
 #include <vector>
 
 #include <async_pqxx/operations/exec.hpp>
 #include <async_pqxx/operations/exec1.hpp>
+#include <async_pqxx/operations/exec_functor.hpp>
 #include <async_pqxx/thread_connection.hpp>
 
 namespace async_pqxx {
@@ -48,6 +50,17 @@ namespace async_pqxx {
             auto work_guard = boost::asio::make_work_guard(boost::asio::get_associated_executor(token));
             return boost::asio::async_initiate<Token, void(boost::system::error_code, pqxx::result)>(
                 internal::exec_impl<decltype(work_guard)>{_io_context, std::move(work_guard), std::move(query)}, token);
+        }
+
+        template <typename FuncRet, typename Token>
+        decltype(auto) exec_functor(std::function<FuncRet(pqxx::connection&)>&& functor, Token&& token) {
+            auto work_guard = boost::asio::make_work_guard(boost::asio::get_associated_executor(token));
+            return boost::asio::async_initiate<Token, void(boost::system::error_code, FuncRet)>(
+                internal::exec_functor_impl<decltype(work_guard), FuncRet>{
+                    _io_context,
+                    std::move(work_guard),
+                    std::forward<std::function<FuncRet(pqxx::connection&)>>(functor)},
+                std::forward<Token>(token));
         }
 
     private:

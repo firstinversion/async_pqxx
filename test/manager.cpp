@@ -26,3 +26,22 @@ TEST_CASE("manager: select from database", "[manager]") {
     });
     ioc.run();
 }
+
+TEST_CASE("manager: select using function", "[manager]") {
+    async_pqxx::manager     manager(4, "host=localhost port=5432");
+    boost::asio::io_context ioc;
+    boost::asio::spawn(ioc, [&](boost::asio::yield_context yield) {
+        auto result = manager.exec_functor<pqxx::row>(
+            [](pqxx::connection& connection) -> pqxx::row {
+                pqxx::work w(connection);
+                pqxx::row  res = w.exec1("SELECT 1;");
+                w.commit();
+
+                return res;
+            },
+            yield);
+
+        REQUIRE(result[0].as<int32_t>() == 1);
+    });
+    ioc.run();
+}

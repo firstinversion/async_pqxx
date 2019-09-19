@@ -9,6 +9,7 @@ conan_basic_setup()
 set(LIBRARY_HEADERS
         include/async_pqxx/operations/exec.hpp
         include/async_pqxx/operations/exec1.hpp
+        include/async_pqxx/operations/exec_functor.hpp
         include/async_pqxx/manager.hpp
         include/async_pqxx/thread_connection.hpp
         )
