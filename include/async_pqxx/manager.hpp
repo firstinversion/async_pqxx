@@ -5,12 +5,11 @@
 #include <cstdint>
 #include <pqxx/connection>
 #include <pqxx/row>
+#include <pqxx/transaction>
 #include <thread>
 #include <type_traits>
 #include <vector>
 
-#include <async_pqxx/operations/exec.hpp>
-#include <async_pqxx/operations/exec1.hpp>
 #include <async_pqxx/operations/exec_functor.hpp>
 #include <async_pqxx/thread_connection.hpp>
 
@@ -39,17 +38,26 @@ namespace async_pqxx {
 
         template <typename Token>
         decltype(auto) exec1(std::string query, Token&& token) {  // NOLINT(performance-unnecessary-value-param)
-            auto work_guard = boost::asio::make_work_guard(boost::asio::get_associated_executor(token));
-            return boost::asio::async_initiate<Token, void(boost::system::error_code, pqxx::row)>(
-                internal::exec1_impl<decltype(work_guard)>{_io_context, std::move(work_guard), std::move(query)},
+            return exec_functor<pqxx::row>(
+                [query = std::move(query)](pqxx::connection& connection) mutable {
+                    pqxx::work w(connection);
+                    auto       res = w.exec1(query);
+                    w.commit();
+                    return res;
+                },
                 token);
         }
 
         template <typename Token>
         decltype(auto) exec(std::string query, Token&& token) {  // NOLINT(performance-unnecessary-value-param)
-            auto work_guard = boost::asio::make_work_guard(boost::asio::get_associated_executor(token));
-            return boost::asio::async_initiate<Token, void(boost::system::error_code, pqxx::result)>(
-                internal::exec_impl<decltype(work_guard)>{_io_context, std::move(work_guard), std::move(query)}, token);
+            return exec_functor<pqxx::result>(
+                [query = std::move(query)](pqxx::connection& connection) mutable {
+                    pqxx::work w(connection);
+                    auto       res = w.exec(query);
+                    w.commit();
+                    return res;
+                },
+                std::forward<Token>(token));
         }
 
         template <typename FuncRet, typename Token>
