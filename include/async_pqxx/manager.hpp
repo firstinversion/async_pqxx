@@ -44,9 +44,10 @@ namespace async_pqxx {
         }
 
         template <typename Token>
-        decltype(auto) exec(std::string query, Token&& token) {
+        decltype(auto) exec(std::string query, Token&& token) {  // NOLINT(performance-unnecessary-value-param)
+            auto work_guard = boost::asio::make_work_guard(boost::asio::get_associated_executor(token));
             return boost::asio::async_initiate<Token, void(boost::system::error_code, pqxx::result)>(
-                internal::exec_impl{_io_context, std::move(query)}, token);
+                internal::exec_impl<decltype(work_guard)>{_io_context, std::move(work_guard), std::move(query)}, token);
         }
 
     private:
