@@ -36,7 +36,6 @@ namespace asyncpq {
 
         template <typename Token>
         decltype(auto) exec1(std::string query, Token&& token) {
-            auto work_guard = boost::asio::make_work_guard(boost::asio::get_associated_executor(token));
             return boost::asio::async_initiate<Token, void(boost::system::error_code, pqxx::row)>(
                 internal::exec1_impl{_io_context, std::move(query)}, token);
         }
