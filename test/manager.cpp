@@ -45,3 +45,21 @@ TEST_CASE("manager: select using function", "[manager]") {
     });
     ioc.run();
 }
+
+TEST_CASE("manager: select with delay", "[manager]") {
+    async_pqxx::manager manager(4, "host=localhost port=5432");
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+    boost::asio::io_context ioc;
+    boost::asio::spawn(ioc, [&](boost::asio::yield_context yield) {
+        auto res1 = manager.exec1("SELECT 1;", yield);
+        REQUIRE(res1[0].as<int>() == 1);
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+        auto res2 = manager.exec1("SELECT 1;", yield);
+        REQUIRE(res2[0].as<int>() == 1);
+    });
+    ioc.run();
+}

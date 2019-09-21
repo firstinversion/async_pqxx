@@ -19,7 +19,8 @@ namespace async_pqxx {
     class manager {
     public:
         manager(std::size_t connection_count, const std::string& connection_string)
-            : _connection_count(connection_count) {
+            : _connection_count(connection_count)
+            , _hold_open(boost::asio::make_work_guard(_io_context)) {
             for (std::size_t i = 0; i < _connection_count; ++i) {
                 _execution_threads.emplace_back([& ioc = _io_context, connection_string = connection_string]() mutable {
                     try {
@@ -33,6 +34,7 @@ namespace async_pqxx {
         }
 
         ~manager() {
+            _hold_open.reset();
             std::for_each(_execution_threads.begin(), _execution_threads.end(), [](auto& t) { t.join(); });
         }
 
@@ -77,9 +79,10 @@ namespace async_pqxx {
         }
 
     private:
-        std::size_t              _connection_count;
-        boost::asio::io_context  _io_context;
-        std::vector<std::thread> _execution_threads;
+        std::size_t                                                              _connection_count;
+        boost::asio::io_context                                                  _io_context;
+        boost::asio::executor_work_guard<boost::asio::io_context::executor_type> _hold_open;
+        std::vector<std::thread>                                                 _execution_threads;
     };
 
 }  // namespace async_pqxx
