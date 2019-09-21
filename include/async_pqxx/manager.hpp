@@ -6,6 +6,7 @@
 #include <pqxx/connection>
 #include <pqxx/row>
 #include <pqxx/transaction>
+#include <spdlog/spdlog.h>
 #include <thread>
 #include <type_traits>
 #include <vector>
@@ -21,7 +22,11 @@ namespace async_pqxx {
             : _connection_count(connection_count) {
             for (std::size_t i = 0; i < _connection_count; ++i) {
                 _execution_threads.emplace_back([& ioc = _io_context, connection_string = connection_string]() mutable {
-                    this_thread::connect(connection_string);
+                    try {
+                        this_thread::connect(connection_string);
+                    } catch (const std::exception& e) {
+                        spdlog::error("async_pqxx: {}", e.what());
+                    }
                     ioc.run();
                 });
             }
