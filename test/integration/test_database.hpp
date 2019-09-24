@@ -1,12 +1,13 @@
 #pragma once
 
 #include <pqxx/connection>
+#include <pqxx/transaction>
 
 namespace async_pqxx::test {
 
     class test_table_points {
     public:
-        explicit test_table_points(pqxx::connection& connection);
+        explicit test_table_points(pqxx::connection& connection, pqxx::work& create);
         ~test_table_points();
 
     private:
@@ -15,7 +16,7 @@ namespace async_pqxx::test {
 
     class test_table_person {
     public:
-        explicit test_table_person(pqxx::connection& connection);
+        explicit test_table_person(pqxx::connection& connection, pqxx::work& create);
         ~test_table_person();
 
     private:

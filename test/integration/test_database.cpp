@@ -19,10 +19,10 @@ namespace async_pqxx::test {
         : _connection(connection) {
         pqxx::work work(connection);
         auto       res = work.exec0("CREATE SCHEMA integration;");
-        work.commit();
 
-        _points = std::make_unique<test_table_points>(_connection);
-        _person = std::make_unique<test_table_person>(_connection);
+        _points = std::make_unique<test_table_points>(_connection, work);
+        _person = std::make_unique<test_table_person>(_connection, work);
+        work.commit();
     }
 
     test_schema::~test_schema() {
@@ -34,17 +34,15 @@ namespace async_pqxx::test {
         work.commit();
     }
 
-    test_table_points::test_table_points(pqxx::connection& connection)
+    test_table_points::test_table_points(pqxx::connection& connection, pqxx::work& create)
         : _connection(connection) {
-        pqxx::work work(_connection);
-        auto       res = work.exec0(
+        auto res = create.exec0(
             "CREATE TABLE integration.points("
             "    id    bigserial          primary key,"
             "    x     double precision   not null,"
             "    y     double precision   not null,"
             "    z     double precision   not null"
             ");");
-        work.commit();
     }
 
     test_table_points::~test_table_points() {
@@ -53,10 +51,9 @@ namespace async_pqxx::test {
         work.commit();
     }
 
-    test_table_person::test_table_person(pqxx::connection& connection)
+    test_table_person::test_table_person(pqxx::connection& connection, pqxx::work& create)
         : _connection(connection) {
-        pqxx::work work(_connection);
-        auto       res = work.exec0(
+        auto res = create.exec0(
             "CREATE TABLE integration.person("
             "    id            bigserial not null,"
             "    first_name    text    not null,"
@@ -68,7 +65,6 @@ namespace async_pqxx::test {
             "    UNIQUE(email),"
             "    UNIQUE(phone)"
             ");");
-        work.commit();
     }
 
     test_table_person::~test_table_person() {
