@@ -1,6 +1,7 @@
 #pragma once
 
 #include <async_pqxx/manager.hpp>
+#include <boost/asio/spawn.hpp>
 #include <pqxx/connection>
 #include <pqxx/transaction>
 
@@ -47,5 +48,11 @@ namespace async_pqxx::test {
     };
 
     async_pqxx::manager get_test_manager();
+
+    inline void run(std::function<void(boost::asio::yield_context)> fn) {
+        boost::asio::io_context ioc;
+        boost::asio::spawn(std::forward<std::function<void(boost::asio::yield_context)>>(fn));
+        ioc.run();
+    }
 
 }  // namespace async_pqxx::test
