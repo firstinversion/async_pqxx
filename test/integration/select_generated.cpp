@@ -1,8 +1,5 @@
 #include <catch2/catch.hpp>
 
-#include <boost/asio/io_context.hpp>
-#include <boost/asio/spawn.hpp>
-
 #include "test_database.hpp"
 
 TEST_CASE("manager: select 1 from database", "[manager]") {

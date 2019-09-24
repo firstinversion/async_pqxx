@@ -38,10 +38,10 @@ namespace async_pqxx::test {
         : _connection(connection) {
         auto res = create.exec0(
             "CREATE TABLE integration.points("
-            "    id    bigserial          primary key,"
-            "    x     double precision   not null,"
-            "    y     double precision   not null,"
-            "    z     double precision   not null"
+            "    id    bigserial    primary key,"
+            "    x     integer      not null,"
+            "    y     integer      not null,"
+            "    z     integer      not null"
             ");");
     }
 
