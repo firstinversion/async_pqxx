@@ -5,9 +5,15 @@
 
 namespace async_pqxx::test {
 
-    test_database::test_database(pqxx::connection& connection)
-        : _connection(connection)
-        , _schema(connection) {}
+    test_database::test_database()
+        : _connection("host=localhost port=5432")
+        , _schema(std::make_unique<test_schema>(_connection)) {}
+
+    test_database::test_database(const char* connection_string)
+        : _connection(connection_string)
+        , _schema(std::make_unique<test_schema>(_connection)) {}
+
+    test_database::~test_database() { _schema.reset(); }
 
     test_schema::test_schema(pqxx::connection& connection)
         : _connection(connection) {
@@ -20,6 +26,9 @@ namespace async_pqxx::test {
     }
 
     test_schema::~test_schema() {
+        _points.reset();
+        _person.reset();
+
         pqxx::work work(_connection);
         auto       res = work.exec0("DROP SCHEMA integration;");
         work.commit();
@@ -30,10 +39,10 @@ namespace async_pqxx::test {
         pqxx::work work(_connection);
         auto       res = work.exec0(
             "CREATE TABLE integration.points("
-            "    id    bigserial primary key,"
-            "    x     double not null,"
-            "    y     double not null,"
-            "    z     double not null"
+            "    id    bigserial          primary key,"
+            "    x     double precision   not null,"
+            "    y     double precision   not null,"
+            "    z     double precision   not null"
             ");");
         work.commit();
     }

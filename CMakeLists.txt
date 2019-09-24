@@ -26,6 +26,7 @@ set(INTEGRATION_TEST_HEADERS
         test/integration/test_database.hpp
         )
 set(INTEGRATION_TEST_SOURCES
+        test/integration/insert.cpp
         test/integration/select_generated.cpp
         test/integration/test_database.cpp
         )

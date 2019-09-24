@@ -35,12 +35,13 @@ namespace async_pqxx::test {
 
     class test_database {
     public:
-        explicit test_database(pqxx::connection& connection);
-        ~test_database() = default;
+        test_database();
+        explicit test_database(const char* connection_string);
+        ~test_database();
 
     private:
-        pqxx::connection& _connection;
-        test_schema       _schema;
+        pqxx::connection             _connection;
+        std::unique_ptr<test_schema> _schema;
     };
 
 }  // namespace async_pqxx::test
