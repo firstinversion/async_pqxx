@@ -22,12 +22,15 @@ target_link_libraries(async_pqxx PUBLIC ${CONAN_LIBS})
 # Tests
 enable_testing()
 
-set(INTEGRATION_TEST_HEADERS)
+set(INTEGRATION_TEST_HEADERS
+        test/integration/test_database.hpp
+        )
 set(INTEGRATION_TEST_SOURCES
-        test/integration/manager.cpp
+        test/integration/select_generated.cpp
+        test/integration/test_database.cpp
         )
 
-add_executable(test_integration_async_pqxx test/integration/main.cpp ${TEST_HEADERS} ${TEST_SOURCES})
+add_executable(test_integration_async_pqxx test/integration/main.cpp ${INTEGRATION_TEST_HEADERS} ${INTEGRATION_TEST_SOURCES})
 target_link_libraries(test_integration_async_pqxx PRIVATE async_pqxx ${CONAN_LIBS})
 add_test(test_integration ./bin/test_integration_async_pqxx)
 
@@ -38,13 +41,13 @@ set(PRECONDITION_TEST_SOURCES
         test/precondition/precondition_thread_local.cpp
         )
 
-add_executable(test_precondition_async_pqxx test/precondition/main.cpp ${TEST_HEADERS} ${TEST_SOURCES})
+add_executable(test_precondition_async_pqxx test/precondition/main.cpp ${PRECONDITION_TEST_HEADERS} ${PRECONDITION_TEST_SOURCES})
 target_link_libraries(test_precondition_async_pqxx PRIVATE async_pqxx ${CONAN_LIBS})
 add_test(test_precondition ./bin/test_precondition_async_pqxx)
 
 set(UNIT_TEST_HEADERS)
 set(UNIT_TEST_SOURCES)
 
-add_executable(test_unit_async_pqxx test/unit/main.cpp ${TEST_HEADERS} ${TEST_SOURCES})
+add_executable(test_unit_async_pqxx test/unit/main.cpp ${UNIT_TEST_HEADERS} ${UNIT_TEST_SOURCES})
 target_link_libraries(test_unit_async_pqxx PRIVATE async_pqxx ${CONAN_LIBS})
 add_test(test_unit ./bin/test_unit_async_pqxx)
