@@ -30,7 +30,7 @@ namespace async_pqxx::test {
         ~schema();
 
     private:
-        pqxx::connection&                  _connection;
+        pqxx::connection&             _connection;
         std::unique_ptr<table_points> _points;
         std::unique_ptr<table_person> _person;
     };
@@ -42,7 +42,7 @@ namespace async_pqxx::test {
         ~database();
 
     private:
-        pqxx::connection             _connection;
+        pqxx::connection        _connection;
         std::unique_ptr<schema> _schema;
     };
 
