@@ -5,27 +5,27 @@
 
 namespace async_pqxx::test {
 
-    test_database::test_database()
+    database::database()
         : _connection("host=localhost port=5432")
-        , _schema(std::make_unique<test_schema>(_connection)) {}
+        , _schema(std::make_unique<schema>(_connection)) {}
 
-    test_database::test_database(const char* connection_string)
+    database::database(const char* connection_string)
         : _connection(connection_string)
-        , _schema(std::make_unique<test_schema>(_connection)) {}
+        , _schema(std::make_unique<schema>(_connection)) {}
 
-    test_database::~test_database() { _schema.reset(); }
+    database::~database() { _schema.reset(); }
 
-    test_schema::test_schema(pqxx::connection& connection)
+    schema::schema(pqxx::connection& connection)
         : _connection(connection) {
         pqxx::work work(connection);
         auto       res = work.exec0("CREATE SCHEMA integration;");
 
-        _points = std::make_unique<test_table_points>(_connection, work);
-        _person = std::make_unique<test_table_person>(_connection, work);
+        _points = std::make_unique<table_points>(_connection, work);
+        _person = std::make_unique<table_person>(_connection, work);
         work.commit();
     }
 
-    test_schema::~test_schema() {
+    schema::~schema() {
         _points.reset();
         _person.reset();
 
@@ -34,7 +34,7 @@ namespace async_pqxx::test {
         work.commit();
     }
 
-    test_table_points::test_table_points(pqxx::connection& connection, pqxx::work& create)
+    table_points::table_points(pqxx::connection& connection, pqxx::work& create)
         : _connection(connection) {
         auto res = create.exec0(
             "CREATE TABLE integration.points("
@@ -45,13 +45,13 @@ namespace async_pqxx::test {
             ");");
     }
 
-    test_table_points::~test_table_points() {
+    table_points::~table_points() {
         pqxx::work work(_connection);
         auto       res = work.exec0("DROP TABLE integration.points;");
         work.commit();
     }
 
-    test_table_person::test_table_person(pqxx::connection& connection, pqxx::work& create)
+    table_person::table_person(pqxx::connection& connection, pqxx::work& create)
         : _connection(connection) {
         auto res = create.exec0(
             "CREATE TABLE integration.person("
@@ -67,10 +67,12 @@ namespace async_pqxx::test {
             ");");
     }
 
-    test_table_person::~test_table_person() {
+    table_person::~table_person() {
         pqxx::work work(_connection);
         auto       res = work.exec0("DROP TABLE integration.person;");
         work.commit();
     }
+
+    async_pqxx::manager get_test_manager() { return async_pqxx::manager(4, "host=localhost port=5432"); }
 
 }  // namespace async_pqxx::test

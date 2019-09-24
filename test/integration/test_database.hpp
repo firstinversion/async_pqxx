@@ -1,48 +1,51 @@
 #pragma once
 
+#include <async_pqxx/manager.hpp>
 #include <pqxx/connection>
 #include <pqxx/transaction>
 
 namespace async_pqxx::test {
 
-    class test_table_points {
+    class table_points {
     public:
-        explicit test_table_points(pqxx::connection& connection, pqxx::work& create);
-        ~test_table_points();
+        explicit table_points(pqxx::connection& connection, pqxx::work& create);
+        ~table_points();
 
     private:
         pqxx::connection& _connection;
     };
 
-    class test_table_person {
+    class table_person {
     public:
-        explicit test_table_person(pqxx::connection& connection, pqxx::work& create);
-        ~test_table_person();
+        explicit table_person(pqxx::connection& connection, pqxx::work& create);
+        ~table_person();
 
     private:
         pqxx::connection& _connection;
     };
 
-    class test_schema {
+    class schema {
     public:
-        explicit test_schema(pqxx::connection& connection);
-        ~test_schema();
+        explicit schema(pqxx::connection& connection);
+        ~schema();
 
     private:
         pqxx::connection&                  _connection;
-        std::unique_ptr<test_table_points> _points;
-        std::unique_ptr<test_table_person> _person;
+        std::unique_ptr<table_points> _points;
+        std::unique_ptr<table_person> _person;
     };
 
-    class test_database {
+    class database {
     public:
-        test_database();
-        explicit test_database(const char* connection_string);
-        ~test_database();
+        database();
+        explicit database(const char* connection_string);
+        ~database();
 
     private:
         pqxx::connection             _connection;
-        std::unique_ptr<test_schema> _schema;
+        std::unique_ptr<schema> _schema;
     };
+
+    async_pqxx::manager get_test_manager();
 
 }  // namespace async_pqxx::test
