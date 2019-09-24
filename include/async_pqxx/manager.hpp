@@ -67,6 +67,18 @@ namespace async_pqxx {
                 std::forward<Token>(token));
         }
 
+        template <typename Token>
+        decltype(auto) exec0(std::string query, Token&& token) {  // NOLINT(performance-unnecessary-value-param)
+            return exec_functor<pqxx::result>(
+                [query = std::move(query)](pqxx::connection& connection) mutable {
+                    pqxx::work w(connection);
+                    auto       res = w.exec0(query);
+                    w.commit();
+                    return res;
+                },
+                std::forward<Token>(token));
+        }
+
         template <typename FuncRet, typename Token>
         decltype(auto) exec_functor(std::function<FuncRet(pqxx::connection&)>&& functor, Token&& token) {
             auto work_guard = boost::asio::make_work_guard(boost::asio::get_associated_executor(token));
