@@ -14,12 +14,15 @@ namespace async_pqxx::internal {
 
         template <typename Token>
         decltype(auto) operator()(Token&& token) {
-            boost::asio::post(_execute_ioc, [&, token = std::forward<Token>(token)]() mutable {
-                auto result = _functor(async_pqxx::this_thread::connection());
-                boost::asio::post(
-                    boost::asio::get_associated_executor(token),
-                    [token = std::forward<Token>(token), result = std::move(result)]() mutable { token({}, result); });
-            });
+            boost::asio::post(_execute_ioc,
+                              [token      = std::forward<Token>(token),
+                               work_guard = std::forward<WorkGuard>(_work_guard),
+                               functor = std::forward<std::function<FuncRet(pqxx::connection&)>>(_functor)]() mutable {
+                                  auto result = functor(async_pqxx::this_thread::connection());
+                                  boost::asio::post(boost::asio::get_associated_executor(token),
+                                                    [token  = std::forward<Token>(token),
+                                                     result = std::move(result)]() mutable { token({}, result); });
+                              });
         }
     };
 
