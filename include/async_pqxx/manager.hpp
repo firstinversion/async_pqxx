@@ -55,16 +55,23 @@ namespace async_pqxx {
                 std::forward<Token>(token));
         }
 
-        template <typename Token>
-        decltype(auto) async_exec1(std::string query, Token&& token) {  // NOLINT(performance-unnecessary-value-param)
-            return exec_functor<pqxx::row>(
-                [query = std::move(query)](pqxx::connection& connection) mutable {
-                    pqxx::work w(connection);
-                    auto       res = w.exec1(query);
-                    w.commit();
+        template <typename ReturnType, typename Token>
+        decltype(auto) exec_in_transaction(std::function<ReturnType(pqxx::work&)>&& fn, Token&& token) {
+            return exec_functor<ReturnType>(
+                [fn = std::forward<std::function<ReturnType(pqxx::work&)>>(fn)](pqxx::connection& connection) {
+                    pqxx::work work(connection);
+                    auto       res = fn(work);
+                    work.commit();
                     return res;
                 },
-                token);
+                std::forward<Token>(token));
+        }
+
+        template <typename Token>
+        decltype(auto) async_exec1(std::string query, Token&& token) {  // NOLINT(performance-unnecessary-value-param)
+            return exec_in_transaction<pqxx::row>(
+                [query = std::move(query)](pqxx::work& work) mutable { return work.exec1(query); },
+                std::forward<Token>(token));
         }
 
         decltype(auto) exec1(std::string query) {  // NOLINT(performance-unnecessary-value-param)
@@ -73,13 +80,8 @@ namespace async_pqxx {
 
         template <typename Token>
         decltype(auto) async_exec(std::string query, Token&& token) {  // NOLINT(performance-unnecessary-value-param)
-            return exec_functor<pqxx::result>(
-                [query = std::move(query)](pqxx::connection& connection) mutable {
-                    pqxx::work w(connection);
-                    auto       res = w.exec(query);
-                    w.commit();
-                    return res;
-                },
+            return exec_in_transaction<pqxx::result>(
+                [query = std::move(query)](pqxx::work& work) mutable { return work.exec(query); },
                 std::forward<Token>(token));
         }
 
@@ -89,13 +91,8 @@ namespace async_pqxx {
 
         template <typename Token>
         decltype(auto) async_exec0(std::string query, Token&& token) {  // NOLINT(performance-unnecessary-value-param)
-            return exec_functor<pqxx::result>(
-                [query = std::move(query)](pqxx::connection& connection) mutable {
-                    pqxx::work w(connection);
-                    auto       res = w.exec0(query);
-                    w.commit();
-                    return res;
-                },
+            return exec_in_transaction<pqxx::result>(
+                [query = std::move(query)](pqxx::work& work) mutable { return work.exec0(query); },
                 std::forward<Token>(token));
         }
 
