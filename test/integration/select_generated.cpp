@@ -1,5 +1,8 @@
 #include <catch2/catch.hpp>
 
+#include <boost/asio/steady_timer.hpp>
+#include <boost/asio/this_coro.hpp>
+
 #include "test_database.hpp"
 
 TEST_CASE("manager: select 1 from database", "[manager]") {
@@ -45,16 +48,19 @@ TEST_CASE("manager: async select using function", "[manager]") {
 
 TEST_CASE("manager: async select with delay", "[manager]") {
     auto manager = async_pqxx::test::get_test_manager();
+    auto ioc     = boost::asio::io_context();
+    auto timer   = boost::asio::steady_timer(ioc);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
-    async_pqxx::test::run([&](boost::asio::yield_context yield) {
+    boost::asio::spawn(ioc, [&](boost::asio::yield_context yield) {
         auto res1 = manager.async_exec1("SELECT 1;", yield);
-        REQUIRE(res1[0].as<int>() == 1);
+        REQUIRE(res1[0].as<int32_t>() == 1);
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        timer.expires_from_now(std::chrono::milliseconds(50));
+        timer.async_wait(yield);
 
         auto res2 = manager.async_exec1("SELECT 1;", yield);
-        REQUIRE(res2[0].as<int>() == 1);
+        REQUIRE(res2[0].as<int32_t>() == 1);
     });
 }

@@ -33,7 +33,7 @@ TEST_CASE("manager: insert point returning id", "[manager]") {
     REQUIRE(result_2[0].as<int64_t>() == 2);
 }
 
-//TEST_CASE("manager: insert param") {
+// TEST_CASE("manager: insert param") {
 //    auto database = async_pqxx::test::database();
 //    auto manager  = async_pqxx::test::get_test_manager();
 //
@@ -45,3 +45,37 @@ TEST_CASE("manager: insert point returning id", "[manager]") {
 //    REQUIRE(result_select[1].as<double>() == 2);
 //    REQUIRE(result_select[2].as<double>() == 3);
 //}
+
+TEST_CASE("manager: insert invalid (future)") {
+    auto database = async_pqxx::test::database();
+    auto manager  = async_pqxx::test::get_test_manager();
+
+    try {
+        auto result = manager.exec0("INSERT INTO integration.points(x, y) VALUES (1, 2);");
+        REQUIRE(result.affected_rows() == 0);
+    } catch (const boost::system::system_error& e) {
+        fmt::print("Boost Error {}: {}\n", e.code().value(), e.code().message());
+    } catch (const std::system_error& e) {
+        fmt::print("System Error {}: {}\n", e.code().value(), e.code().message());
+    } catch (const std::exception& e) {
+        fmt::print("Exception: {}\n", e.what());
+    }
+}
+
+TEST_CASE("manager: insert invalid (yield_context)") {
+    auto database = async_pqxx::test::database();
+    auto manager  = async_pqxx::test::get_test_manager();
+
+    async_pqxx::test::run([&](boost::asio::yield_context yield) {
+        try {
+            auto result = manager.async_exec0("INSERT INTO integration.points(x, y) VALUES (1, 2);", yield);
+            REQUIRE(result.affected_rows() == 0);
+        } catch (const boost::system::system_error& e) {
+            fmt::print("Boost Error {}: {}\n", e.code().value(), e.code().message());
+        } catch (const std::system_error& e) {
+            fmt::print("System Error {}: {}\n", e.code().value(), e.code().message());
+        } catch (const std::exception& e) {
+            fmt::print("Exception: {}\n", e.what());
+        }
+    });
+}
