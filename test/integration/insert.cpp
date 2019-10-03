@@ -54,11 +54,7 @@ TEST_CASE("manager: insert invalid (future)") {
         auto result = manager.exec0("INSERT INTO integration.points(x, y) VALUES (1, 2);");
         REQUIRE(result.affected_rows() == 0);
     } catch (const boost::system::system_error& e) {
-        fmt::print("Boost Error {}: {}\n", e.code().value(), e.code().message());
-    } catch (const std::system_error& e) {
-        fmt::print("System Error {}: {}\n", e.code().value(), e.code().message());
-    } catch (const std::exception& e) {
-        fmt::print("Exception: {}\n", e.what());
+        REQUIRE(e.code().value() == 84);
     }
 }
 
@@ -71,11 +67,7 @@ TEST_CASE("manager: insert invalid (yield_context)") {
             auto result = manager.async_exec0("INSERT INTO integration.points(x, y) VALUES (1, 2);", yield);
             REQUIRE(result.affected_rows() == 0);
         } catch (const boost::system::system_error& e) {
-            fmt::print("Boost Error {}: {}\n", e.code().value(), e.code().message());
-        } catch (const std::system_error& e) {
-            fmt::print("System Error {}: {}\n", e.code().value(), e.code().message());
-        } catch (const std::exception& e) {
-            fmt::print("Exception: {}\n", e.what());
+            REQUIRE(e.code().value() == 84);
         }
     });
 }

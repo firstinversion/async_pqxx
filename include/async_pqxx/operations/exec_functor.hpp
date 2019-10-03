@@ -2,6 +2,7 @@
 
 #include <boost/asio/post.hpp>
 
+#include <async_pqxx/error.hpp>
 #include <async_pqxx/thread_connection.hpp>
 
 namespace async_pqxx::internal {
@@ -27,9 +28,9 @@ namespace async_pqxx::internal {
                                           });
                     } catch (const pqxx::sql_error& e) {
                         boost::asio::post(boost::asio::get_associated_executor(token),
-                                          [token = std::forward<Token>(token)]() mutable {
-                                              token(boost::system::error_code{1, boost::system::system_category()},
-                                                    std::move(FuncRet{}));
+                                          [token = std::forward<Token>(token),
+                                           ecode = async_pqxx::make_async_pqxx_error(e.sqlstate())]() mutable {
+                                              token(ecode, std::move(FuncRet{}));
                                           });
                     }
                 });
