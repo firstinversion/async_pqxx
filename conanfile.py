@@ -19,18 +19,21 @@ class BeastMode(ConanFile):
 
     def build(self):
         cmake = CMake(self)
-        cmake.configure()
+        cmake.configure(defs={'USE_CONAN': True, 'BUILD_STATIC': not self.options.shared})
         cmake.build()
         if tools.get_env("CONAN_RUN_TESTS", True):
             cmake.test()
 
     def package(self):
-        self.copy("**/*", dst="include", src="include")
-        self.copy("*.lib", dst="lib", keep_path=False)
-        self.copy("*.dll", dst="bin", keep_path=False)
-        self.copy("*.dylib*", dst="lib", keep_path=False)
-        self.copy("*.so", dst="lib", keep_path=False)
-        self.copy("*.a", dst="lib", keep_path=False)
+        cmake = CMake(self)
+        cmake.install()
+
+        # self.copy("**/*", dst="include", src="include")
+        # self.copy("*.lib", dst="lib", keep_path=False)
+        # self.copy("*.dll", dst="bin", keep_path=False)
+        # self.copy("*.dylib*", dst="lib", keep_path=False)
+        # self.copy("*.so", dst="lib", keep_path=False)
+        # self.copy("*.a", dst="lib", keep_path=False)
 
     def package_info(self):
         self.cpp_info.libs = ["async_pqxx"]

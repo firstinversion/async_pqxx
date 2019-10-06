@@ -1,9 +1,14 @@
 cmake_minimum_required(VERSION 3.13.4)
 
+# Options
+option(USE_CONAN "Using conan to build library." OFF)
+option(BUILD_STATIC "Build the library statically instead of shared." OFF)
+
+# Project
 project(async_pqxx VERSION 0.1.2 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()
+conan_basic_setup(KEEP_RPATHS)
 
 # Library
 set(LIBRARY_HEADERS
@@ -17,9 +22,20 @@ set(LIBRARY_SOURCES
         src/thread_connection.cpp
         )
 
-add_library(async_pqxx STATIC ${LIBRARY_HEADERS} ${LIBRARY_SOURCES})
+if (BUILD_STATIC)
+    add_library(async_pqxx STATIC ${LIBRARY_HEADERS} ${LIBRARY_SOURCES})
+else ()
+    add_library(async_pqxx SHARED ${LIBRARY_HEADERS} ${LIBRARY_SOURCES})
+endif ()
 target_include_directories(async_pqxx PUBLIC include)
 target_link_libraries(async_pqxx PUBLIC ${CONAN_LIBS})
+if (USE_CONAN)
+    install(TARGETS async_pqxx EXPORT async_pqxx_export
+            ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+            LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+    install(DIRECTORY include/async_pqxx
+            DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
+endif ()
 
 # Tests
 enable_testing()
