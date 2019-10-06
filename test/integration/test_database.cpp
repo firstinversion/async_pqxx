@@ -1,16 +1,21 @@
 #include "test_database.hpp"
 
-#include <stdlib.h>
 #include <pqxx/transaction>
 #include <spdlog/spdlog.h>
+#include <stdlib.h>
 
 namespace async_pqxx::test {
 
     const char* default_connection_string() {
-        char* provided;
-        provided = getenv("ASYNC_PQXX_TEST_DATABASE");
-        if (provided) return provided;
-        else return "host=localhost port=5432";
+        static const char* default_str = "host=localhost port=5432";
+        char*              provided_str;
+        provided_str = getenv("ASYNC_PQXX_TEST_DATABASE");
+
+        spdlog::info("DATABASE CONNECTION STRING: {}", provided_str ? provided_str : default_str);
+        if (provided_str)
+            return provided_str;
+        else
+            return default_str;
     }
 
     database::database()
