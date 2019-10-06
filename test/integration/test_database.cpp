@@ -1,12 +1,20 @@
 #include "test_database.hpp"
 
+#include <stdlib.h>
 #include <pqxx/transaction>
 #include <spdlog/spdlog.h>
 
 namespace async_pqxx::test {
 
+    const char* default_connection_string() {
+        char* provided;
+        provided = getenv("ASYNC_PQXX_TEST_DATABASE");
+        if (provided) return provided;
+        else return "host=localhost port=5432";
+    }
+
     database::database()
-        : _connection("host=localhost port=5432")
+        : _connection(default_connection_string())
         , _schema(std::make_unique<schema>(_connection)) {}
 
     database::database(const char* connection_string)
@@ -73,6 +81,6 @@ namespace async_pqxx::test {
         work.commit();
     }
 
-    async_pqxx::manager get_test_manager() { return async_pqxx::manager(4, "host=localhost port=5432"); }
+    async_pqxx::manager get_test_manager() { return async_pqxx::manager(4, default_connection_string()); }
 
 }  // namespace async_pqxx::test

@@ -20,3 +20,7 @@ definitions:
   services:
     postgres:
       image: postgres
+      variables:
+        POSTGRES_DB: 'postgres'
+        POSTGRES_USER: 'test_user'
+        POSTGRES_PASSWORD: 'test_user_password'
