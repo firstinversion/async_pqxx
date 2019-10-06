@@ -1,0 +1,17 @@
+pipelines:
+  default:
+    - parallel:
+        - step:
+            image: firstinversion/build_environment:gcc-8
+            script:
+              - conan create . firstinversion/testing
+  tags:
+    '*':
+      - parallel:
+          - step:
+              image: firstinversion/build_environment:gcc-8
+              script:
+                - conan create . firstinversion/testing
+                - conan test conan_test async_pqxx/$BITBUCKET_TAG@firstinversion/testing
+                - conan user $CONAN_USER -r firstinversion -p $CONAN_PASSWORD
+                - conan upload async_pqxx/$BITBUCKET_TAG@firstinversion/testing --all -r=firstinversion
