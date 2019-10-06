@@ -22,7 +22,7 @@ class BeastMode(ConanFile):
         cmake.configure(defs={'USE_CONAN': True, 'BUILD_STATIC': not self.options.shared})
         cmake.build()
         if tools.get_env("CONAN_RUN_TESTS", True):
-            cmake.test()
+            cmake.test(output_on_failure=True)
 
     def package(self):
         cmake = CMake(self)
