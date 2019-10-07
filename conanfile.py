@@ -3,7 +3,7 @@ from conans import ConanFile, CMake, tools
 
 class BeastMode(ConanFile):
     name = "async_pqxx"
-    version = "0.1.3"
+    version = "0.1.4"
     license = "MIT"
     author = ("Andrew Rademacher <andrewrademacher@icloud.com>")
     url = "https://bitbucket.org/firstinversion/async_pqxx/"
