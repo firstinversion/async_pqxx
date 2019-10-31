@@ -5,7 +5,7 @@ option(USE_CONAN "Using conan to build library." OFF)
 option(BUILD_STATIC "Build the library statically instead of shared." OFF)
 
 # Project
-project(async_pqxx VERSION 0.1.5 LANGUAGES CXX)
+project(async_pqxx VERSION 0.1.6 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup(KEEP_RPATHS)

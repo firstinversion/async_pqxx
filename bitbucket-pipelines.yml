@@ -2,7 +2,7 @@ pipelines:
   default:
     - parallel:
       - step:
-          image: firstinversion/build_environment:gcc-8
+          image: firstinversion/build_environment:gcc-8_0.1.0
           caches:
             - conan-gcc-8
           script:
@@ -10,7 +10,7 @@ pipelines:
           services:
             - postgres
       - step:
-          image: firstinversion/build_environment:gcc-9
+          image: firstinversion/build_environment:gcc-9_0.1.0
           caches:
             - conan-gcc-9
           script:
@@ -22,7 +22,7 @@ pipelines:
     '*':
       - parallel:
         - step:
-            image: firstinversion/build_environment:gcc-8
+            image: firstinversion/build_environment:gcc-8_0.1.0
             caches:
               - conan-gcc-8
             script:
@@ -33,7 +33,7 @@ pipelines:
             services:
               - postgres
         - step:
-            image: firstinversion/build_environment:gcc-9
+            image: firstinversion/build_environment:gcc-9_0.1.0
             caches:
               - conan-gcc-9
             script:
