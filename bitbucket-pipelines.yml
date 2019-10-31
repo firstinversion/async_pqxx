@@ -2,7 +2,10 @@ pipelines:
   default:
     - parallel:
       - step:
-          image: firstinversion/build_environment:gcc-8_0.1.0
+          image:
+            name: docker.firstinversion.io/fi_build_environment:gcc-8
+            username: $DOCKER_USERNAME
+            password: $DOCKER_PASSWORD
           caches:
             - conan-gcc-8
           script:
@@ -10,7 +13,10 @@ pipelines:
           services:
             - postgres
       - step:
-          image: firstinversion/build_environment:gcc-9_0.1.0
+          image:
+            name: docker.firstinversion.io/fi_build_environment:gcc-9
+            username: $DOCKER_USERNAME
+            password: $DOCKER_PASSWORD
           caches:
             - conan-gcc-9
           script:
@@ -22,7 +28,10 @@ pipelines:
     '*':
       - parallel:
         - step:
-            image: firstinversion/build_environment:gcc-8_0.1.0
+            image:
+              name: docker.firstinversion.io/fi_build_environment:gcc-8
+              username: $DOCKER_USERNAME
+              password: $DOCKER_PASSWORD
             caches:
               - conan-gcc-8
             script:
@@ -33,7 +42,10 @@ pipelines:
             services:
               - postgres
         - step:
-            image: firstinversion/build_environment:gcc-9_0.1.0
+            image:
+              name: docker.firstinversion.io/fi_build_environment:gcc-9
+              username: $DOCKER_USERNAME
+              password: $DOCKER_PASSWORD
             caches:
               - conan-gcc-9
             script:
