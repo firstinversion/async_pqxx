@@ -3,13 +3,13 @@ from conans import ConanFile, CMake, tools
 
 class BeastMode(ConanFile):
     name = "async_pqxx"
-    version = "0.1.7"
+    version = "0.1.8"
     license = "MIT"
     author = ("Andrew Rademacher <andrewrademacher@icloud.com>")
     url = "https://bitbucket.org/firstinversion/async_pqxx/"
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False]}
-    default_options = "shared=True"
+    default_options = "shared=False"
     generators = "cmake"
     exports_sources = "*", "!cmake-build*/*", "!build/*"
     requires = ("boost/1.71.0@conan/stable",

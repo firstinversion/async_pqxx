@@ -11,7 +11,7 @@ class TestrapidmessageConan(ConanFile):
     topics = ("<Put some tag here>", "<here>", "<and here>")
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
-    required = "async_pqxx/0.1.7@firstinversion/testing"
+    required = "async_pqxx/0.1.8@firstinversion/testing"
 
     def build(self):
         cmake = CMake(self)
