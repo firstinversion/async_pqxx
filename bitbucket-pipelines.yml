@@ -1,24 +1,53 @@
 pipelines:
   default:
-    - step:
-        image: firstinversion/build_environment:gcc-8
-        script:
-          - CONAN_RUN_TEST=True conan create . firstinversion/testing
-        services:
-          - postgres
-  tags:
-    '*':
+    - parallel:
       - step:
           image: firstinversion/build_environment:gcc-8
+          caches:
+            - conan-gcc-8
           script:
-            - CONAN_RUN_TEST=True conan create . firstinversion/testing
-            - conan test conan_test async_pqxx/$BITBUCKET_TAG@firstinversion/testing
-            - conan user $CONAN_USER -r firstinversion -p $CONAN_PASSWORD
-            - conan upload async_pqxx/$BITBUCKET_TAG@firstinversion/testing --all -r=firstinversion
+            - CONAN_RUN_TEST=True conan create . firstinversion/testing --build missing
+          services:
+            - postgres
+      - step:
+          image: firstinversion/build_environment:gcc-9
+          caches:
+            - conan-gcc-9
+          script:
+            - CONAN_RUN_TEST=True conan create . firstinversion/testing --build missing
           services:
             - postgres
 
+  tags:
+    '*':
+      - parallel:
+        - step:
+            image: firstinversion/build_environment:gcc-8
+            caches:
+              - conan-gcc-8
+            script:
+              - CONAN_RUN_TEST=True conan create . firstinversion/testing --build missing
+              - conan test conan_test async_pqxx/$BITBUCKET_TAG@firstinversion/testing
+              - conan user $CONAN_USER -r firstinversion -p $CONAN_PASSWORD
+              - conan upload async_pqxx/$BITBUCKET_TAG@firstinversion/testing --all -r=firstinversion
+            services:
+              - postgres
+        - step:
+            image: firstinversion/build_environment:gcc-9
+            caches:
+              - conan-gcc-9
+            script:
+              - CONAN_RUN_TEST=True conan create . firstinversion/testing --build missing
+              - conan test conan_test async_pqxx/$BITBUCKET_TAG@firstinversion/testing
+              - conan user $CONAN_USER -r firstinversion -p $CONAN_PASSWORD
+              - conan upload async_pqxx/$BITBUCKET_TAG@firstinversion/testing --all -r=firstinversion
+            services:
+              - postgres
+
 definitions:
+  caches:
+    conan-gcc-8: /root/.conan
+    conan-gcc-9: /root/.conan
   services:
     postgres:
       image: postgres

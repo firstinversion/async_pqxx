@@ -3,7 +3,7 @@ from conans import ConanFile, CMake, tools
 
 class BeastMode(ConanFile):
     name = "async_pqxx"
-    version = "0.1.4"
+    version = "0.1.5"
     license = "MIT"
     author = ("Andrew Rademacher <andrewrademacher@icloud.com>")
     url = "https://bitbucket.org/firstinversion/async_pqxx/"
@@ -13,9 +13,9 @@ class BeastMode(ConanFile):
     generators = "cmake"
     exports_sources = "*", "!cmake-build*/*", "!build/*"
     requires = ("boost/1.71.0@conan/stable",
-                "spdlog/1.3.1@bincrafters/stable",
+                "spdlog/1.4.2@bincrafters/stable",
                 "libpqxx/6.4.5@bincrafters/stable")
-    build_requires = ("Catch2/2.9.1@catchorg/stable",)
+    build_requires = ("Catch2/2.10.2@catchorg/stable",)
 
     def build(self):
         cmake = CMake(self)
